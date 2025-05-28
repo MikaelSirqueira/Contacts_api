@@ -5,31 +5,34 @@ export const contatoService = {
     return contatoRepository.getAll();
   },
 
-  async postContact(nome: string, telefone: string) {
-    const existsContact = await contatoRepository.getByPhoneNumber(telefone);
-    if (existsContact) {
-      throw new Error("Telefone já cadastrado.");
+  async validateContact(id?: string, telefone?: string) {
+    if (id) {
+      const existsContact = await contatoRepository.getById(id);
+      if (!existsContact) {
+        throw new Error("Contato não encontrado.");
+      }
     }
 
-    const createdContact = contatoRepository.post(nome, telefone);
-    return createdContact;
+    if (telefone) {
+      const existsPhoneNumber = await contatoRepository.getByPhoneNumber(telefone);
+      if (existsPhoneNumber) {
+        throw new Error("Telefone já cadastrado.");
+      }
+    }
+  },
+
+  async postContact(nome: string, telefone: string) {
+    await this.validateContact(undefined, telefone);
+    return contatoRepository.post(nome, telefone);
   },
 
   async updateContact(id: string, nome: string, telefone: string) {
-    const existsContact = await contatoRepository.getById(id);
-    if (!existsContact) {
-      throw new Error("Contato não encontrado.");
-    }
-
+    await this.validateContact(id, telefone);
     return contatoRepository.update(id, nome, telefone);
   },
 
   async deleteContact(id: string) {
-    const existsContact = await contatoRepository.getById(id);
-    if (!existsContact) {
-      throw new Error("Contato não encontrado.");
-    }
-    
+    await this.validateContact(id);
     return contatoRepository.delete(id);
   },
 };
