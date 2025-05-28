@@ -11,5 +11,6 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log('Server running!');
+  console.log(`Server running on ${PORT}!`);
+  console.log(`DB running on ${process.env.DB_PORT}!`);
 }); 
